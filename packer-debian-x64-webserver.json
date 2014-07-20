@@ -1,0 +1,55 @@
+{
+    "variables": {
+        "username": "root",
+        "password": "r00tme",
+        "memory": "1024",
+        "cpus": "1",
+        "database_name": "{{env `DB_NAME`}}"
+    },
+    "builders": [{
+        "name": "debian64-webserver-vbox",
+        "type": "virtualbox-iso",
+        "guest_os_type": "Debian_64",
+        "guest_additions_mode": "disable",
+        "iso_url": "http://cdimage.debian.org/debian-cd/7.5.0/amd64/iso-cd/debian-7.5.0-amd64-netinst.iso",
+        "iso_checksum": "0a86e2fdef365f8bd626de7e754189291174b86a312c655fa6585eec3c6e5caa5e8f128e37a6989ae8d45743e158191d1b178d76bf338cb4512f0ee4aa9cda3c",
+        "iso_checksum_type": "sha512",
+        "ssh_username": "{{user `username`}}",
+        "ssh_password": "{{user `password`}}",
+        "ssh_wait_timeout": "30m",
+        "shutdown_command": "echo 'packer' | shutdown -h now",
+        "vm_name": "my-webserver",
+        "format": "ova",
+        "hard_drive_interface": "sata",
+        "disk_size": 20000,
+        "vboxmanage": [
+            ["modifyvm", "{{.Name}}", "--memory", "{{user `memory`}}"],
+            ["modifyvm", "{{.Name}}", "--cpus", "{{user `cpus`}}"],
+            ["modifyvm", "{{.Name}}", "--vram", "10"]
+        ],
+        "boot_wait": "5s",
+        "boot_command": ["<esc><wait>auto url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/debian64-webserver.cfg <enter>"],
+        "http_directory": "http"
+    }],
+    "provisioners": [{
+        "type": "file",
+        "source": "scripts",
+        "destination": "/tmp"
+    }, {
+        "type": "shell",
+        "script": "prepare_data_folder"
+    }, {
+        "type": "file",
+        "source": "webpage",
+        "destination": "/data"
+    }, , {
+        "type": "shell",
+        "script": "setup_database",
+        "environment_vars": [
+            "DB_NAME={{user `database_name`}}"
+        ]
+    }, {
+        "type": "shell",
+        "script": "configure_apache"
+    }]
+}

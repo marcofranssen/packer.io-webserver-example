@@ -1,0 +1,5 @@
+#!/bin/sh
+
+mkdir /data
+chown www-data:www-data /data
+chmod 777 /data

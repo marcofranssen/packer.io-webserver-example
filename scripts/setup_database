@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# if database name not is empty
+if [[ ! -z "$DB_NAME" -a "$DB_NAME" != " " ]]; then
+    MYSQLPASS=r00tmysql #as defined in the debian preseed file
+    mysqladmin create $DB_NAME -p$MYSQLPASS
+    mysql -u root -p$MYSQLPASS -e "GRANT ALL ON $DB_NAME.* TO $DB_NAME@localhost IDENTIFIED BY '$DB_NAME'"
+    mysql -u $DB_NAME -p$DB_NAME -e "CREATE TABLE user (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, username VARCHAR(50), email VARCHAR(50), password BINARY(64)) TYPE=innodb"
+    # mysql -u $DB_NAME -p$DB_NAME $DB_NAME < mydatabase_creationscript.sql
+fi

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+echo "<VirtualHost *:80>" >> /etc/apache2/sites-available/mywebpage
+echo "  ServerName mywebpage" >> /etc/apache2/sites-available/mywebpage
+echo "  DocumentRoot /data" >> /etc/apache2/sites-available/mywebpage
+echo "</VirtualHost>" >> /etc/apache2/sites-available/mywebpage
+
+# cp /tmp/sites-available/mywebapge /etc/apache2/sites-available
+
+/etc/init.d/apache2 restart
